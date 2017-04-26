@@ -1,3 +1,4 @@
+<!-- update user account information. User must be logged in -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
@@ -12,61 +13,59 @@
 	<div class="container">
 		<h1>Update User Account</h1>
 		<form class="form-horizontal" action="/update-account" method="post">
-			
+			<!-- first name -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="firstName">First Name</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" required>
+					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" onblur="uploadPreReqs()" required>
 				</div>
 			</div>
-				
+			<!-- last name -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" required>
+					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" onblur="uploadPreReqs()" required>
 				</div>
 			</div>
-
+			<!-- email -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="email">Email</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" required >
+					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" onblur="uploadPreReqs()" required >
 				</div>
 			</div>
-	
+			<!-- job title -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="job-title">Job Title</label>
 				<div class="col-sm-6">
 					<input class="form-control" type="text" id="job-title" name="jobTitle" value="{{details.title}}" required>
 				</div>
 			</div>
-
-
+			<!-- pulls security question 1 from database -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label">{{details.question1}}</label>
 				<div class="col-sm-6">
 					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer1}}" disabled >
 				</div>
 			</div>	
-
+			<!-- pulls security question 2 from database -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label">{{details.question2}}</label>
 				<div class="col-sm-6">
 					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer2}}" disabled >
 				</div>
 			</div>
-
-			
+			<!-- upload signature -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label">Upload Signature</label>
 				<div class="col-sm-6">
-					<span class="btn btn-default" id="file-load-button">Upload</span>
+					<button type="button" class="btn btn-default" id="file-load-button">Upload</button>
 				</div>
 			</div>
 			<div class="is-hidden">
-				<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required>
+				<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png">
 			</div>
-
+			<!-- preview signature -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label">Preview Signature</label>
 				<div class="col-sm-6">
@@ -74,8 +73,8 @@
 				</div>
 			</div>
 
-				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" >
-				
+				<input type="hidden" id="sig-url" name="signature" value="{{details.signature}}" >
+			<!-- submit button -->
 			<div class="form-group">
 				<div class="col-sm-6 col-sm-offset-4">
 					<button type="submit" class="btn btn-primary">Update Account</button>

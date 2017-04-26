@@ -1,4 +1,4 @@
- <!-- lists admins -->
+<!-- in admin view: list existing employees -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
@@ -15,7 +15,7 @@
 			<li><a href="/new-manager-account">Add Users</a></li>
 		</ul>
 	</li>
-	<li class="dropdown active">
+	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
 		</a>
@@ -24,7 +24,7 @@
 			<li><a href="/new-admin-account">Add Admins</a></li>
 		</ul>
 	</li>
-	<li class="dropdown">
+	<li class="dropdown active">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
 		</a>
@@ -38,31 +38,28 @@
 {% endblock activeNav %}
 
 {% block content %}
-	<!-- table of all existing admins -->
 	<div class="container">
+		<!-- lists existing employees -->
 		<div class="table-responsive">
-			{% if admins|length > 0 %}
+			{% if employees|length > 0 %}
 			<table class="table">
 				<tr>
-					<th>Admin</th>
-					<th>Create Date</th>
+					<th>Employee</th>
 					<th>Email</th>
-					<th>Edit Admin?</th>
-					<th>Delete Admin?</th>
+					<th>Edit Employee?</th>
+					<th>Delete Employee?</th>
 				</tr>
-				{% for admin in admins %}
+				{% for employee in employees %}
 				<tr>
-					<td>{{admins[admin].admin}}</td>
-					<td>{{admins[admin].createdOn}}</td>
-					<td>{{admins[admin].adminEmail}}</td>
-					<td><a href="/update-other-admin-account/?adminemail={{admins[admin].adminEmail}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
-					<td><a href="/remove-admin/?admin={{admins[admin].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
+					<td>{{employees[employee].employee}}</td>
+					<td>{{employees[employee].empemail}}</td>
+					<td><a href="/update-employee/?employee={{employees[employee].id}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
+					<td><a href="/remove-employee/?employee={{employees[employee].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
 				</tr>
 				{% endfor %}
 			</table>
-			<!-- if there are no admins show message -->
 			{% else %}
-			<p>There are no admins other than yourself in the system.</p>
+			<p>There are no employees in the system.</p>
 			{% endif %}
 		</div>
 	</div>

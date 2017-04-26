@@ -1,6 +1,30 @@
-
+	/*
+	  Function determines whether all of the proper form items contain content before signature file is uploaded
+	*/
+	function uploadPreReqs(){
+		uploadButton = document.getElementById("file-load-button");
+		if (document.getElementById("firstName").value &&
+			document.getElementById("firstName").value != '' &&
+			document.getElementById("lastName").value &&
+			document.getElementById("lastName").value != '' &&
+			document.getElementById("email").value &&
+			document.getElementById("email").value != '') {
+			uploadButton.disabled = false;
+		}
+		else{
+			uploadButton.disabled = true;
+		}
+	}
+	
+	function deleteTempFile(filename){
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', "/delete_s3/?file_name="+filename);
+		xhr.send();
+	}
+	
     /*
       Function to carry out the actual POST request to S3 using the signed request from the Python app.
+	  Source: https://devcenter.heroku.com/articles/s3-upload-python
     */
     function uploadFile(file, s3Data, url){
       const xhr = new XMLHttpRequest();
@@ -14,15 +38,43 @@
       xhr.onreadystatechange = () => {
         if(xhr.readyState === 4){
           if(xhr.status === 200 || xhr.status === 204){
-            document.getElementById('preview').src = url;
             document.getElementById('sig-url').value = url;
           }
           else{
-            alert('Could not upload file.');
+            //alert('Could not upload file.');
           }
         }
       };
       xhr.send(postData);
+    }
+	
+    /*
+      Function to carry out the actual POST request to S3 using the signed request from the Python app.
+	  This function uploads a temporary signature file to the database to keep the browser cache from
+	  loading an older version of the signature file
+	  Source: https://devcenter.heroku.com/articles/s3-upload-python
+    */
+    function uploadTempFile(file, s3Data, url, filename){
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', s3Data.url);
+      xhr.setRequestHeader('x-amz-acl', 'public-read', 'Access-Control-Allow-Origin');
+      const postData = new FormData();
+      for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+      }
+      postData.append('file', file);
+      xhr.onreadystatechange = () => {
+        if(xhr.readyState === 4){
+          if(xhr.status === 200 || xhr.status === 204){
+            document.getElementById('preview').src = url;
+          }
+          else{
+            //alert('Could not upload file.');
+          }
+        }
+      };
+      xhr.send(postData);
+	  //deleteTempFile(filename);
     }
     /*
       Function to get the temporary signed request from the Python app.
@@ -34,9 +86,12 @@
 		email = document.getElementById('email').value;
 		email = email.replace(/@/g , "_");
 		email = email.replace(/\./g , "_");
+		tempFile = email
 		email = email + "_sig.png"
+		tempFile = tempFile + Date.now() + "_sig.png"
 		const xhr = new XMLHttpRequest();
-		xhr.open("GET", "/sign_s3?file_name="+email+"&file_type="+file.type);
+		const xhrTemp = new XMLHttpRequest();
+		xhr.open("GET", "/sign_s3/?file_name="+email+"&file_type="+file.type);
 		xhr.onreadystatechange = () => {
         if(xhr.readyState === 4){
           if(xhr.status === 200){
@@ -44,11 +99,24 @@
             uploadFile(file, response.data, response.url);
           }
           else{
-            alert('Could not get signed URL.');
+            //alert('Could not get signed URL.');
+          }
+        }
+      };
+	  xhrTemp.open("GET", "/sign_s3/?file_name="+tempFile+"&file_type="+file.type);
+		xhrTemp.onreadystatechange = () => {
+        if(xhrTemp.readyState === 4){
+          if(xhr.status === 200){
+            const response = JSON.parse(xhrTemp.responseText);
+            uploadTempFile(file, response.data, response.url, tempFile);
+          }
+          else{
+            //alert('Could not get signed URL.');
           }
         }
       };
       xhr.send();
+	  xhrTemp.send();
     }
     /*
        Function called when file input updated. If there is a file selected, then
@@ -58,7 +126,7 @@
       const files = document.getElementById('file_input').files;
       const file = files[0];
       if(!file){
-        return alert('No file selected.');
+        //return alert('No file selected.');
       }
       getSignedRequest(file);
     }

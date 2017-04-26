@@ -1,87 +1,116 @@
+<!-- in admin view: creates new admin account -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
+	<!-- navbar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
-	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
-	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
-	<li><a href="/admins"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
-	<li class="active" data-toggle="tab"><a href="/new-admin-account"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
-	<li><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+	<li class="dropdown">
+		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-user"></span> User Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/users">View Users</li>
+			<li><a href="/new-manager-account">Add Users</a></li>
+		</ul>
+	</li>
+	<li class="dropdown active">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/admins">View Admins</li>
+			<li><a href="/new-admin-account">Add Admins</a></li>
+		</ul>
+	</li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/new-employee">Add Employees</li>
+			<li><a href="/employees-list">View Employees</a></li>
+			<li><a href="/award-types">Add Award Types</a></li>
+			<li><a href="/reports">Award Reports</a></li>
+		</ul>
+	</li>
 {% endblock activeNav %}
 
 {% block content %}
 	<div class="container">
 		<h1>Create New Admin Account</h1>
 		<form class="form-horizontal" action="/new-admin-account" method="post">
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="firstName">First Name</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" id="firstName" name="firstName" required >
-					</div>
+			<!-- first name -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="firstName">First Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="firstName" name="firstName" required >
 				</div>
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="lastName">Last Name</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" id="lastName" name="lastName" required >
-					</div>
+			</div>
+			<!-- last name -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="lastName" name="lastName" required >
 				</div>
-
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="email">Email</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="email" id='email' name="email" required >
-					</div>
+			</div>
+			<!-- email -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="email">Email</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="email" id='email' name="email" required >
 				</div>
-
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="pass1">Password</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="password" id="pass1" name="password" required >
-					</div>
+			</div>
+			<!-- password -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="pass1">Password</label>
+				<div class="col-sm-6">
+					<input pattern=".{3,}" title="3 characters minimum" class="form-control" type="password" id="pass1" name="password" required >
 				</div>
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="pass2">Reenter Password</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="password" id="pass2" name="password" onkeyup="checkPass(); return false;" required>
-						<span class="help-block">
-							<span class="is-hidden" id="confirmMessage"></span> 
-						</span>
-					</div>
+			</div>
+			<!-- reenter password -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="pass2">Reenter Password</label>
+				<div class="col-sm-6">
+					<input pattern=".{3,}" title="3 characters minimum" class="form-control" type="password" id="pass2" name="password" onkeyup="checkPass(); return false;" required>
+					<span class="help-block">
+						<span class="is-hidden" id="confirmMessage"></span> 
+					</span>
 				</div>
-				
-				<div class="form-group">
-					<div class="col-sm-4">
-						<select class="form-control" name="security-question-1">
-							{% for key,value in questions.iteritems() %}
-								<option value="{{ key }}">{{ value }}</option>
-							{% endfor %}
-						</select>
-					</div>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" name="security-answer-1" placeholder="Answer" required >
-					</div>
-				</div>	
-
-				<div class="form-group">
-					<div class="col-sm-4">
-						<select class="form-control" name="security-question-2">
+			</div>
+			<!-- security question 1 -->
+			<div class="form-group">
+				<div class="col-sm-4">
+					<select class="form-control" name="security-question-1">
 						{% for key,value in questions.iteritems() %}
 							<option value="{{ key }}">{{ value }}</option>
 						{% endfor %}
-						</select>
-					</div>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" name="security-answer-2" placeholder="Answer" required >
-					</div>
+					</select>
 				</div>
-
-				<div class="form-group">
-					<div class="col-sm-6 col-sm-offset-4">
-						<button type="submit" class="btn btn-primary">Create Admin Account</button>
-					</div>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-1" placeholder="Answer" required >
 				</div>
+			</div>	
+			<!-- security question 2 -->
+			<div class="form-group">
+				<div class="col-sm-4">
+					<select class="form-control" name="security-question-2">
+					{% for key,value in questions.iteritems() %}
+						<option value="{{ key }}">{{ value }}</option>
+					{% endfor %}
+					</select>
+				</div>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-2" placeholder="Answer" required >
+				</div>
+			</div>
+			<!-- submit button -->
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<button type="submit" class="btn btn-primary">Create Admin Account</button>
+				</div>
+			</div>
 		</form>
 	</div>
 {% endblock content %}

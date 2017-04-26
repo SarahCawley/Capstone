@@ -1,3 +1,4 @@
+<!-- in admin view: shows reports -->
 {% extends "loggedInBase.html" %}
 
 {% block head %}
@@ -8,24 +9,68 @@
 {% endblock head %}
 
 {% block activeNav %}
+	<!-- navbar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
-	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
-	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
-	<li class="active" data-toggle="tab"><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+	<li class="dropdown">
+		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-user"></span> User Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/users">View Users</li>
+			<li><a href="/new-manager-account">Add Users</a></li>
+		</ul>
+	</li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/admins">View Admins</li>
+			<li><a href="/new-admin-account">Add Admins</a></li>
+		</ul>
+	</li>
+	<li class="dropdown active">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/new-employee">Add Employees</li>
+			<li><a href="/employees-list">View Employees</a></li>
+			<li><a href="/award-types">Add Award Types</a></li>
+			<li><a href="/reports">Award Reports</a></li>
+		</ul>
+	</li>
 {% endblock activeNav %}
 
 {% block content %}
 	<div class="container">
-		<form id="award-by-type-form" method="post" action="/reports">
+		<h1>Reports</h1>
+		<br>
+		<h4>Choose Report To View</h4>
+		<!-- all awards -->
+		<form class="inline-form" id="all-awards-form" method="post" action="/reports">
 			<div class="form-group">
-				<label for="award-by-type-btn">Get Awards By Type</label>
-				<input type="hidden" name="award-by-type" value="1">
-				<button type="submit" class="btn btn-primary" id="award-by-type-btn">Submit</button>
+				<input type="hidden" id="all-awards-report" name="all-awards" value="1">
+				<button type="submit" class="btn btn-primary" id="all-awards-btn">All Awards</button>
 			</div>
 		</form>
-		<div id="award-by-type-report"></div>
-  </div>
+		<!-- awards by user -->
+		<form class="inline-form" id="award-by-manager-form" method="post" action="/reports">
+			<div class="form-group">
+				<input type="hidden" id="award-by-manager" name="award-type" value="2">
+				<button type="submit" class="btn btn-primary" id="award-by-manager-btn">Awards By User</button>
+			</div>
+		</form>
+		<!-- awards by recipient -->
+		<form class="inline-form" id="award-by-employee-form" method="post" action="/reports">
+			<div class="form-group">
+				<input type="hidden" id="award-by-employee" name="award-type" value="3">
+				<button type="submit" class="btn btn-primary" id="award-by-employee-btn">Awards By Employee</button>
+			</div>
+		</form>
+		<hr>
+		<br>
+		<div id="award-report"></div>
 	</div>
+	
 {% endblock content %}

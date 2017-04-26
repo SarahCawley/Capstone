@@ -1,3 +1,8 @@
+'''
+This file handles all of the database calls in the application. It uses the
+SQL Alchemy library to make SQL calls to the PostGresSQL Database
+'''
+
 from __future__ import print_function #debug
 import os,sys #sys debug
 import boto3
@@ -15,23 +20,22 @@ from random import randint
 db = SQLAlchemy()
 
 
-#consider making this a singleton class
+#Initialize the database with the model files from model.py
 class PostgresDatabase(object):
-	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme,clsEmployee,clsAwardBorder):
+	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardBackground,clsAwardTheme,clsEmployee,clsAwardBorder):
 		self.Question = clsQuestion
 		self.Account = clsAccount
 		self.Admin = clsAdmin
 		self.Manager = clsManager
 		self.AwardType = clsAwardType
 		self.Award = clsAward
-		self.AwardArchive = clsAwardArchive
 		self.AwardBackground = clsAwardBackground
 		self.AwardTheme = clsAwardTheme
 		self.Employee = clsEmployee
 		self.AwardBorder = clsAwardBorder
 		self.database = db
 		
-		
+	#retrieve listing of award name colors	
 	def getAwardThemes(self):
 		themes = {}
 		results = db.session.query(self.AwardTheme).all()
@@ -40,7 +44,7 @@ class PostgresDatabase(object):
 			themes[r.id] = r.theme
 			
 		return themes
-
+	#retrieve list of awards belonging to a certain logged in user
 	def getAwards(self,email):
 		awards = {}
 		creator = self.Manager.query.filter_by(email=email).first()
@@ -53,11 +57,16 @@ class PostgresDatabase(object):
 			awards[r.id] = {'id':r.id,'issuedOn':issuedOnString,'recipient':recipient,'type':r.award_type.name}
 			
 		return awards
-		
+	
+	#retrieve listing of all the awards in the database
+	def getAllAwards(self):
+		return db.session.query(self.Award).all()
+	
+	#return a single award object by id	
 	def getAward(self, id):
 		return self.Award.query.get(id)
 			
-		
+	#retrieve listing of award background tile types	
 	def getAwardBackgrounds(self):
 		backgrounds = {}
 		results = db.session.query(self.AwardBackground).all()
@@ -67,7 +76,7 @@ class PostgresDatabase(object):
 			
 		return backgrounds
 
-		
+	#retrieve listing of award types (employee of the month... etc)	
 	def getAwardTypes(self):
 		types = {}
 		results = db.session.query(self.AwardType).all()
@@ -77,7 +86,7 @@ class PostgresDatabase(object):
 			
 		return types
 
-		
+	#retrieve the available security questions for the account creation page	
 	def getQuestions(self):
 		questions = {}
 		results = db.session.query(self.Question).all()
@@ -87,7 +96,7 @@ class PostgresDatabase(object):
 			
 		return questions
 
-		
+	#download the user signature file from the Amazon s3 bucket	
 	def downloadUserSig(self,email):
 		bucket = os.environ.get('S3_BUCKET_NAME')
 		
@@ -106,8 +115,22 @@ class PostgresDatabase(object):
 			print(e,file=sys.stderr)
 			return None
 		return True
+	
+	#delete the user signature file from the Amazon s3 bucket
+	def deleteUserSig(self, filename):
+		bucket = os.environ.get('S3_BUCKET_NAME')
+		client = boto3.client('s3')
+		try:
+			client.delete_object(Bucket=bucket, Key=filename)
+		except ClientError as e:
+			print(e.response['Error']['Message'],file=sys.stderr)
+			return None
+		except IOError as e:
+			print(e,file=sys.stderr)
+			return None
+		return True	
 
-		
+	#get pertinent information about logged in user	
 	def getUserDetails(self,email):
 		user = self.Manager.query.filter_by(email=email).first()
 		
@@ -130,7 +153,8 @@ class PostgresDatabase(object):
 		'signature':user.signature}
 		
 		return details
-		
+	
+	#retrieve a listing of all users	
 	def getUsers(self):
 		managers = {}
 		results = self.Manager.query.order_by(asc(self.Manager.lname)).all()
@@ -143,10 +167,12 @@ class PostgresDatabase(object):
 			managers[r.id] = {'id':r.id,'createdOn':createdOnString,'title':r.title,'user':user, 'useremail': r.email}
 			
 		return managers
-		
+	
+	#retrieve a single user
 	def getUser(self, id):
 		return self.Manager.query.get(id)
 	
+	#retrieve a listing of all the admins
 	def getAdmins(self, email):
 		admins = {}
 		results = self.Admin.query.filter(self.Admin.email != email, self.Admin.email != 'root@admin.com').all()
@@ -156,10 +182,12 @@ class PostgresDatabase(object):
 			admin = r.fname + ' ' + r.lname
 			admins[r.id] = {'id':r.id, 'createdOn': createdOnString, 'admin':admin, 'adminEmail': r.email}
 		return admins
-		
+	
+	#retrieve a single admin user
 	def getAdmin(self, id):
 		return self.Admin.query.get(id)
 	
+	#get pertinent details about logged in admin
 	def getAdminDetails(self,email):
 		admin = self.Admin.query.filter_by(email=email).first()
 		
@@ -178,7 +206,8 @@ class PostgresDatabase(object):
 		'answer2':admin.account.answer2}
 		
 		return details
-		
+	
+	#log specific user into the system
 	def login(self,payload):
 		email = payload['userName']
 		pword = payload['password']
@@ -208,7 +237,7 @@ class PostgresDatabase(object):
 				
 		return {'status':400,'account':None,'message':'An invalid account type was given.'}
 		
-		
+	#add new user account to database	
 	def createAccount(self,payload):
 		fname = payload['firstName']
 		lname = payload['lastName']
@@ -226,7 +255,8 @@ class PostgresDatabase(object):
 		manager = self.Manager(account,title,fname,lname,sign,email)
 			
 		return [account,manager]
-		
+	
+	# add new admin account to the database
 	def createAdminAccount(self,payload):
 		fname = payload['firstName']
 		lname = payload['lastName']
@@ -243,23 +273,61 @@ class PostgresDatabase(object):
 			
 		return [account,admin]
 
-		
+	# update non-admin account information in the database	
 	def updateAccount(self,payload,email):
 		user = self.Manager.query.filter_by(email=email).first()
+		
+		#update signature file if email was changed
+		if (user.email != payload['email'] and user.signature == payload['signature']):
+			sigFilename = payload['email']
+			sigFilename = replace(sigFilename,'@','_')
+			sigFilename = replace(sigFilename,'.','_')
+			sigFilename += '_sig.png'
+			oldFilename = user.signature
+			oldFilename = oldFilename.replace('https://camelopardalis-assets.s3.amazonaws.com/',"")
+			bucket = os.environ.get('S3_BUCKET_NAME')
+			s3 = boto3.resource('s3')
+			s3.Object(bucket,sigFilename).copy_from(CopySource={'Bucket':bucket, 'Key':oldFilename})
+			s3.Object(bucket,oldFilename).delete()
+			tempSig = payload['signature']
+			tempSig = tempSig.replace(oldFilename, sigFilename)
+			user.signature = tempSig
+		else:
+			user.signature = payload['signature']
 		
 		user.fname = payload['firstName']
 		user.lname = payload['lastName']
 		user.email = payload['email']
 		user.title = payload['jobTitle']
-		user.signature = payload['signature']
+
 		
 		try:
 			db.session.commit()
 		except IntegrityError:
+			db.session.rollback()
 			return False
 			
 		return True
+	
+	# update employee information in the database	
+	def updateEmployee(self,payload):
+		employee = self.Employee.query.get(int(payload['emp-id']))
 		
+		employee.fname = payload['first-name']
+		employee.lname = payload['last-name']
+		employee.email = payload['emp-email']
+		
+		try:
+			db.session.commit()
+		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
+			return False
+			
+		return True
+	
+	#update the admin account details in database
 	def updateAdminAccount(self,payload,email):
 		admin = self.Admin.query.filter_by(email=email).first()
 		
@@ -270,15 +338,21 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 
-		
+	# add a new award to the database from user submittal	
 	def createAward(self,payload,email):
 		creator = self.Manager.query.filter_by(email=email).first()
 		awardType = self.AwardType.query.get(payload['type'])
 
+		if creator is None or awardType is None:
+			return None
+			
 		creatorId = creator.id
 		typeId = awardType.id
 		message = payload['message']
@@ -291,8 +365,19 @@ class PostgresDatabase(object):
 		award = self.Award(creatorId,typeId,message,issuedOn,recipient,background,theme,border)
 			
 		return award
+	
+	# add a new employee to the database
+	def createEmployee(self,payload):
 
+		fname = payload['first-name']
+		lname = payload['last-name']
+		email = payload['emp-email']
 		
+		employee = self.Employee(fname,lname,email)
+			
+		return employee
+
+	# saves all object files retrieved by other calls to the database	
 	def save(self,obj):
 		try:
 			if type(obj) is list:
@@ -304,11 +389,12 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 	
-	
+	# deletes all object files retrieved by other calls to the database	
 	def remove(self,obj):
 		try:
 			db.session.delete(obj)
@@ -316,15 +402,16 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 	
-	
+	# retrieves a single account from database
 	def getAccount(self,id):
 		return self.Account.query.get(id)
 	
-	
+	# sets logged in user to authenticated
 	def setAuthenticated(self,account,val):		
 		try:
 			account.authenticated = val
@@ -333,11 +420,12 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 
-		
+	# retrieves a list of employees for create award page
 	def getEmployees(self,req):
 		if req['lname'] != "":
 			employees = {}
@@ -350,8 +438,22 @@ class PostgresDatabase(object):
 			return employees
 		else:
 			return {'status':404,'message':'The search returned no results.'} 
+	
+	# returns a single emplyoee by id
+	def getEmployee(self, id):
+		return self.Employee.query.get(id)
+	
+	# retrieves a list of all employees for employee listing page
+	def getAllEmployees(self):
+		employees = {}
+		results = self.Employee.query.order_by(asc(self.Employee.lname)).all()
 		
-
+		for r in results:
+			employee = r.fname + ' ' + r.lname
+			employees[r.id] = {'id':r.id,'employee':employee, 'empemail': r.email}		
+		return employees
+	
+	# gets account verification code for password recovery route
 	def genVerificationCode(self,id):
 		account = self.Account.query.get(id)
 		code = randint(10000,99999)
@@ -363,11 +465,12 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return None
 			
 		return code
 	
-	
+	#changes account password based on submitted password in recovery form
 	def resetPasswordByEmail(self,payload):
 		response = {'status':200,'message':'Your password has been reset.'}
 		
@@ -393,11 +496,14 @@ class PostgresDatabase(object):
 			db.session.commit()
 		except IntegrityError:
 			response = {'status':500,'message':'Unable to reset password.'}
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return response
 			
 		return response 
 	
-	
+	# checks to see that security questions are answered correctly in password retrieval
 	def verifyAnswers(self,payload):
 		accountType = 'user'
 		details = self.getUserDetails(payload['email'])
@@ -418,7 +524,7 @@ class PostgresDatabase(object):
 
 		return response
 			
-		
+	#changes password based on submitted password during password recovery process	
 	def resetPasswordByQuestions(self,payload):
 		account = self.Account.query.get(payload['account'])
 		account.pword = argon2.using(rounds=4).hash(payload['password']) 
@@ -426,10 +532,14 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
-		
+	
+	#retrieve user by email
 	def findUser(self,email):
 		user = self.Manager.query.filter_by(email=email).first()
 		
@@ -441,21 +551,14 @@ class PostgresDatabase(object):
 				return {'status':200,'message':'User found.','role':'admin','email':email}
 		
 		return {'status':200,'message':'User found.','role':'user','email':email}	
+	
+	# add a new award type to database
+	def addAwardType(self,payload):
+		types = self.getAwardTypes()
 		
-	'''
-	def createRootAdmin(self):
-		pword = argon2.using(rounds=4).hash('root')
-		quest1 = 1
-		quest2 = 2
-		answ1 = 'root'
-		answ2 = 'root'
-		email = 'root@admin.com'
-		created = datetime.now()
+		if payload['awardType'] not in types.values():
+			type = self.AwardType(payload['awardType'])
+			return self.save(type)
 		
-		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
-		admin = self.Admin(account,email)
-		
-		db.session.add(account)
-		db.session.add(admin)
-		db.session.commit()
-	'''
+		return False
+	

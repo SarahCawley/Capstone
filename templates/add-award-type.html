@@ -1,10 +1,10 @@
- <!-- lists admins -->
+<!-- In Admin view: Lets admins view current and add new award types -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<!-- navbar -->
+	<!-- Navbar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -15,7 +15,7 @@
 			<li><a href="/new-manager-account">Add Users</a></li>
 		</ul>
 	</li>
-	<li class="dropdown active">
+	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
 		</a>
@@ -24,7 +24,7 @@
 			<li><a href="/new-admin-account">Add Admins</a></li>
 		</ul>
 	</li>
-	<li class="dropdown">
+	<li class="dropdown active">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
 		</a>
@@ -38,32 +38,40 @@
 {% endblock activeNav %}
 
 {% block content %}
-	<!-- table of all existing admins -->
 	<div class="container">
-		<div class="table-responsive">
-			{% if admins|length > 0 %}
-			<table class="table">
-				<tr>
-					<th>Admin</th>
-					<th>Create Date</th>
-					<th>Email</th>
-					<th>Edit Admin?</th>
-					<th>Delete Admin?</th>
-				</tr>
-				{% for admin in admins %}
-				<tr>
-					<td>{{admins[admin].admin}}</td>
-					<td>{{admins[admin].createdOn}}</td>
-					<td>{{admins[admin].adminEmail}}</td>
-					<td><a href="/update-other-admin-account/?adminemail={{admins[admin].adminEmail}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
-					<td><a href="/remove-admin/?admin={{admins[admin].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
-				</tr>
-				{% endfor %}
-			</table>
-			<!-- if there are no admins show message -->
-			{% else %}
-			<p>There are no admins other than yourself in the system.</p>
-			{% endif %}
+		<h1>View and add award types</h1>
+		<br>
+		<!-- pulls in current awards from database -->
+		<div class="row">
+			<label class="col-sm-4 control-label text-right" for="award-types-list">Current Award Types</label>
+			<div class="col-sm-6">
+				<div class="list-group" id="award-types-list">
+					{% for id in types %}
+						<a href="#" class="list-group-item "><strong>{{types[id]}}</strong></a>
+					{% endfor %}
+				</div>
+			</div>
 		</div>
+
+	<br>
+		<div class="row"><div class="col-sm-8 col-sm-offset-2"><hr style="border-color:#337aa1; border-width:2px"></div></div>
+		<br>
+		<!-- form to create new award type -->
+		<form class="form-horizontal" action="/award-types" method="post">
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="awardType">Create New Award Type</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="awardType" placeholder="Caution: Award types cannot be deleted" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<input type="submit" class="btn btn-primary">
+				</div>
+
+			</div>
+		</form>
+		
+		
 	</div>
 {% endblock content %}

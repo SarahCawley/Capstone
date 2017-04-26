@@ -2,11 +2,10 @@ $(document).ready(function(){
 
 	$body = $("body");
 	
-	//causes freeze after answering security questions
-	/*$(document).on({
-	    ajaxStart: function() { $body.addClass("loading");    },
-	   // ajaxComplete: function() { $body.removeClass("loading"); }    
-	});*/
+	/*onlick for signature upload button*/
+	$("#file-load-button").click(function (){
+	    $("#file_input").click();
+	});
 	
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
@@ -16,7 +15,7 @@ $(document).ready(function(){
 	      url = that.attr('action'),
 	      type = that.attr('method'),
 	      data = $("#last-name").val();
-	      data = '{"lname":"' + data + '"}';
+	      data = JSON.stringify({'lname':data});
 	      //console.log(data);
 
 	  	$.ajax('/get-employee', {
@@ -25,6 +24,12 @@ $(document).ready(function(){
 			contentType: 'application/json',
 		  	dataType: 'json',
 
+		  	beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
 	  		success: function(response) {
 	  			$body.removeClass("loading");
 	  			$('#find-employees').removeClass('is-hidden');
@@ -54,6 +59,17 @@ $(document).ready(function(){
 	});
 
 
+	/*add border around selected border image in create page */
+	$(".border-choice").on("click", function(){
+		$(".border-choice").removeClass("selected-image");
+		$(this).addClass("selected-image");
+	});
+
+	/*add border around selected background image in create page */
+	$(".background-choice").on("click", function(){
+		$(".background-choice").removeClass("selected-image");
+		$(this).addClass("selected-image");
+	});
 
 	/*if choosing to reset password via email a warning box will apear  in /password*/
 	$("#reset-via-email").on("click", function(){
@@ -62,17 +78,29 @@ $(document).ready(function(){
 		console.log("button pressed");
 	});
 
+	/*if choosing to reset password via questions email warning will dissapear */
+	$('#reset-via-questions').on("click",function(){
+		$("#send-email-reset").addClass("is-hidden");
+		console.log("button pressed");
+	});
+
+	/*disable reset via button after it has been clicked*/
+	$('#submit-reset-via').on("click", function(){
+		// $("#submit-reset-via-button").attr("disabled", true);
+		console.log("should disable");
+		// $("#submit-reset-via").css("background-color": "gray");
+	});
 
 	/* choosing to reset via email or password on /password*/
 	var email = $("#reset-password").on('submit', function(){
 		event.preventDefault();
 		var that = $(this),
-	      url = that.attr('action'),
-	      type = that.attr('method'),
-	      radioValue = $("input[name='reset-method']:checked").val();
-	      email = $("input[name='email']").val();
-		  data = JSON.stringify({'email':email, 'reset-method':radioValue})
-	      console.log(data);
+		url = that.attr('action'),
+		type = that.attr('method'),
+		radioValue = $("input[name='reset-method']:checked").val();
+		email = $("input[name='email']").val();
+		data = JSON.stringify({'email':email, 'reset-method':radioValue})
+		console.log(data);
 		
 
 		$.ajax(url,{
@@ -80,10 +108,13 @@ $(document).ready(function(){
 			data: data,
 			contentType: 'application/json',
 		  	dataType: 'json',
-			
+		  	beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
 			success: function(response){
-
-				$body.removeClass("loading");
 				if(radioValue == "email"){
 					
 					//console.log("I will now display email stuff");
@@ -94,6 +125,7 @@ $(document).ready(function(){
 					if(response['status'] == 200 || response['status'] == 202){
 						alert(response['message']);
 						window.location.replace("/reset-password");
+						$("#submit-reset-via-button").attr("disabled", true);
 					}
 					else{
 						alert(response['message']);
@@ -104,6 +136,8 @@ $(document).ready(function(){
 				else{
 					// $('#reset-password-main-form').addClass("is-hidden");
 					if(response['status'] == 200){
+						$("#submit-reset-via-button").attr("disabled", true);
+						$("#reset-via-email-button").attr("disabled", true);
 						$("#security-questions").removeClass("is-hidden");
 						$("#send-email-reset").addClass("is-hidden");
 						
@@ -146,6 +180,12 @@ $(document).ready(function(){
 			contentType: 'application/json',
 			dataType: 'json',
 
+			beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
 			success: function(response){
 				$('#security-questions').addClass("is-hidden");
 
@@ -156,7 +196,6 @@ $(document).ready(function(){
 				else{
 					$('#password-reset-failure').removeClass('is-hidden');
 				}			
-			
 			},
 			error: function(jqXHR, exception){
 	      		console.log("error:");
@@ -166,12 +205,55 @@ $(document).ready(function(){
 	    });
 	});
 
-	/*onlick for signature upload button*/
-	$("#file-load-button").click(function () {
-	    $("#file_input").click();
-	});
-});
 
+	
+/*
+	//for sucess message /new-employee
+	$('#add-new-employee').on('submit', function(){
+		event.preventDefault();
+		var that = $(this),
+	      url = that.attr('action'),
+	      type = that.attr('method'),
+	      firstName = $('#firstName').val();
+	      lastName = $('#lastName').val();
+	      email =  $('#empEmail').val();
+		  data = JSON.stringify({'fname': firstName, 'lname': lastName, 'email' : email })
+	      console.log(data);
+	      console.log("button clicked");
+
+		$.ajax(url, {
+			type: type,
+			data: data,
+			contentType: 'application/json',
+			dataType: 'json',
+
+			beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
+			success: function(response){
+				$('#add-new-employee').addClass("is-hidden");
+
+				if(response['status'] == 200){
+					$('#emplyee-added').removeClass('is-hidden');
+				}
+				else{
+					$('#emplyee-not-added').removeClass('is-hidden');
+				}			
+			},
+			error: function(jqXHR, exception){
+	      		console.log("error:");
+	      		console.log(jqXHR);
+	      		//display some error
+	      	}
+	    });
+
+	});*/
+
+
+});
 
 /*checks that the passwords are the same*/
 function checkPass() {
@@ -205,7 +287,6 @@ function checkPass() {
         $(message).addClass('text-danger');
         $(message).html('Passwords Do Not Match!');
     }
-
 }
 
 

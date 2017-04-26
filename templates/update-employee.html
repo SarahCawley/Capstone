@@ -1,4 +1,4 @@
-<!-- in admin view: Updates an admin account. admins must go into view other admins then click the edit button to get here -->
+<!-- from admin view: lets an admin update an employee's information -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
@@ -15,7 +15,7 @@
 			<li><a href="/new-manager-account">Add Users</a></li>
 		</ul>
 	</li>
-	<li class="dropdown active">
+	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
 		</a>
@@ -24,12 +24,12 @@
 			<li><a href="/new-admin-account">Add Admins</a></li>
 		</ul>
 	</li>
-	<li class="dropdown">
+	<li class="dropdown active">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
 		</a>
 		<ul class="dropdown-menu">
-			<li><a href="#">Add Employees</li>
+			<li><a href="/new-employee">Add Employees</li>
 			<li><a href="/employees-list">View Employees</a></li>
 			<li><a href="/award-types">Add Award Types</a></li>
 			<li><a href="/reports">Award Reports</a></li>
@@ -39,50 +39,46 @@
 
 {% block content %}
 	<div class="container">
-		<!-- admin to update is chosen from previous page -->
-		<h1>Update Admin Account: {{details.fname}} {{details.lname}}</h1>
-		<form class="form-horizontal" action="/update-admin-account/" method="post">
+		<h1>Update Employee Information: {{employee.fname}} {{employee.lname}}</h1>
+		<br>
+		<form class="form-horizontal" action="/update-employee/" method="post" id="update-new-employee">
 			<!-- first name -->
 			<div class="form-group">
-				<label class="col-sm-4 control-label" for="firstName">First Name</label>
+				<label class="col-sm-4 control-label" for="first-name">First Name</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" required>
+					<input class="form-control" type="text" name="first-name" id="first-name" value="{{employee.fname}}" placeholder="First Name" required>
 				</div>
 			</div>
 			<!-- last name -->
 			<div class="form-group">
-				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
+				<label class="col-sm-4 control-label" for="last-name">Last Name</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" required>
+					<input class="form-control" type="text" name="last-name" id="last-name" value="{{employee.lname}}" placeholder="Last Name" required>
 				</div>
 			</div>
 			<!-- email -->
 			<div class="form-group">
-				<label class="col-sm-4 control-label" for="email">Email</label>
+				<label class="col-sm-4 control-label" for="emp-email">Email</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" required >
+					<input class="form-control" type="email" name="emp-email" id="emp-email" value="{{employee.email}}" placeholder="Email" required>
 				</div>
 			</div>
-			<!-- security question 1 -->
-			<div class="form-group">
-				<label class="col-sm-4 control-label">{{details.question1}}</label>
-				<div class="col-sm-6">
-					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer1}}" disabled >
-				</div>
-			</div>	
-			<!-- security question 2 -->
-			<div class="form-group">
-				<label class="col-sm-4 control-label">{{details.question2}}</label>
-				<div class="col-sm-6">
-					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer2}}" disabled >
-				</div>
+			<!-- hidden field with employee's id number -->
+			<div class="col-sm-6">
+					<input class="form-control" type="hidden" name="emp-id" id="emp-id" value="{{employee.id}}">
 			</div>
-			<!-- submit button -->
+			<!-- submit -->
 			<div class="form-group">
 				<div class="col-sm-6 col-sm-offset-4">
-					<button type="submit" class="btn btn-primary">Update Admin Account</button>
+					<input type="submit" class="btn btn-primary">
 				</div>
-			</div>				
+			</div>
 		</form>
+		<!--<div class="col-sm-6 col-sm-offset-4 is-hidden" id="emplyee-added">
+			<h4>Employee Added</h4>
+		</div>
+		<div class="col-sm-6 col-sm-offset-4 is-hidden" id="emplyee-not-added">
+			<h4>Error: Employee not added</h4>
+		</div>-->
 	</div>
 {% endblock content %}

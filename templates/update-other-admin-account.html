@@ -1,4 +1,4 @@
-<!-- in admin view: updates a user account. Linked from list user -->
+<!-- in admin view: allows an admin to update the account of another admin -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
@@ -6,7 +6,7 @@
 {% block activeNav %}
 	<!-- nav bar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
-	<li class="dropdown active">
+	<li class="dropdown">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-user"></span> User Options <span class="caret"></span>
 		</a>
@@ -15,7 +15,7 @@
 			<li><a href="/new-manager-account">Add Users</a></li>
 		</ul>
 	</li>
-	<li class="dropdown">
+	<li class="dropdown active">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
 		</a>
@@ -39,88 +39,49 @@
 
 {% block content %}
 	<div class="container">
-		<!-- name passed in -->
-		<h1>Update User Account: {{details.fname}} {{details.lname}}</h1>
-		<form class="form-horizontal" action="/update-manager-account/" method="post">
+		<h1>Update Admin Account: {{details.fname}} {{details.lname}}</h1>
+		<form class="form-horizontal" action="/update-other-admin-account/" method="post">
 			<!-- first name -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="firstName">First Name</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" onblur="uploadPreReqs()" required>
+					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" required>
 				</div>
 			</div>
 			<!-- last name -->	
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" onblur="uploadPreReqs()" required>
+					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" required>
 				</div>
 			</div>
 			<!-- email -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="email">Email</label>
 				<div class="col-sm-6">
-					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" onblur="uploadPreReqs()" required >
+					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" required >
 				</div>
 			</div>
-			<!-- job title -->
-			<div class="form-group">
-				<label class="col-sm-4 control-label" for="job-title">Job Title</label>
-				<div class="col-sm-6">
-					<input class="form-control" type="text" id="job-title" name="jobTitle" value="{{details.title}}" required>
-				</div>
-			</div>
-
-			<!-- security question 1 from data base -->
+			<!-- pulls security question 1 from database -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label">{{details.question1}}</label>
 				<div class="col-sm-6">
 					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer1}}" disabled >
 				</div>
 			</div>	
-			<!-- pulls security question 1 from database -->
+			<!-- pulls security question 2 from database -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label">{{details.question2}}</label>
 				<div class="col-sm-6">
 					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer2}}" disabled >
 				</div>
 			</div>
-			<!-- upload signature -->
-			<div class="form-group">
-				<label class="col-sm-4 control-label">Upload Signature</label>
-				<div class="col-sm-6">
-					<button type="button" class="btn btn-default" id="file-load-button">Upload</button>
-				</div>
-			</div>
-			<div class="is-hidden">
-				<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png">
-			</div>
-			<!-- preview signature -->
-			<div class="form-group">
-				<label class="col-sm-4 control-label">Preview Signature</label>
-				<div class="col-sm-6">
-					<div id="status"><img id="preview" class="img-thumbnail img-responsive" src="{{details.signature}}"></div>
-				</div>
-			</div>
-
-				<input type="hidden" id="sig-url" name="signature" value="{{details.signature}}" >
 			<!-- submit button -->	
 			<div class="form-group">
 				<div class="col-sm-6 col-sm-offset-4">
-					<button type="submit" class="btn btn-primary">Update Account</button>
+					<button type="submit" class="btn btn-primary">Update Admin Account</button>
 				</div>
 			</div>				
 		</form>
 	</div>
-	
-	<!-- adds a timestamp to the src attribute for the image preview in order to prevent image caching -->
-	<script> 
-		var path = $("#preview").attr("src")
-		var newPath = path + '?' + $.now()
-		$("#preview").attr("src",newPath) 
-	</script>
-	
-{% block javascript %}
-    <SCRIPT SRC="/static/js/uploadSig.js"></SCRIPT>
-{% endblock %}
 {% endblock content %}

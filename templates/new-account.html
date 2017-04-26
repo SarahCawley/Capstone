@@ -1,3 +1,4 @@
+<!-- in user view: creates new user account -->
 {% extends "base.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
@@ -7,100 +8,103 @@
 	<div class="container">
 		<h1>Create New User Account</h1>
 		<form class="form-horizontal" action="/new-account" method="post">
-			
-
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="firstName">First Name</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" id="firstName" name="firstName" required >
-					</div>
+			<!-- first name -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="firstName">First Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="firstName" name="firstName" onblur="uploadPreReqs()" required >
 				</div>
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="lastName">Last Name</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" id="lastName" name="lastName" required >
-					</div>
+			</div>
+			<!-- last name -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="lastName" name="lastName" onblur="uploadPreReqs()" required >
 				</div>
-
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="email">Email</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="email" id='email' name="email" required >
-					</div>
+			</div>
+			<!-- email -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="email">Email</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="email" id='email' name="email" onblur="uploadPreReqs()" required >
 				</div>
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="jobTitle">Job Title</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" id="jobTitle" name="jobTitle" required >
-					</div>
+			</div>
+			<!-- job title -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="jobTitle">Job Title</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="jobTitle" name="jobTitle" required >
 				</div>
-
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="pass1">Password</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="password" id="pass1" name="password" required >
-					</div>
+			</div>
+			<!-- password -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="pass1">Password</label>
+				<div class="col-sm-6">
+					<input pattern=".{3,}" title="3 characters minimum" class="form-control" type="password" id="pass1" name="password" required >
 				</div>
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="pass2">Reenter Password</label>
-					<div class="col-sm-6">
-						<input class="form-control" type="password" id="pass2" name="password" onkeyup="checkPass(); return false;" required>
-						<span class="help-block">
-							<span class="is-hidden" id="confirmMessage"></span> 
-						</span>
-					</div>
+			</div>
+			<!-- repeat password -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="pass2">Reenter Password</label>
+				<div class="col-sm-6">
+					<input pattern=".{3,}"  title="3 characters minimum"class="form-control" type="password" id="pass2" name="password" onkeyup="checkPass(); return false;" required>
+					<span class="help-block">
+						<span class="is-hidden" id="confirmMessage"></span> 
+					</span>
 				</div>
-				
-				<div class="form-group">
-					<div class="col-sm-4">
-						<select class="form-control" name="security-question-1">
-							{% for key,value in questions.iteritems() %}
-								<option value="{{ key }}">{{ value }}</option>
-							{% endfor %}
-						</select>
-					</div>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" name="security-answer-1" placeholder="Answer" required >
-					</div>
-				</div>	
-
-				<div class="form-group">
-					<div class="col-sm-4">
-						<select class="form-control" name="security-question-2">
+			</div>
+			<!-- security question 1 -->
+			<div class="form-group">
+				<div class="col-sm-4">
+					<select class="form-control" name="security-question-1">
 						{% for key,value in questions.iteritems() %}
 							<option value="{{ key }}">{{ value }}</option>
 						{% endfor %}
-						</select>
-					</div>
-					<div class="col-sm-6">
-						<input class="form-control" type="text" name="security-answer-2" placeholder="Answer" required >
-					</div>
+					</select>
 				</div>
-				<!-- the file upload. the input is hidden behind my button -->
-				<div class="form-group">
-					<label class="col-sm-4 control-label">Upload Signature</label>
-					<div class="col-sm-6">
-						<span class="btn btn-default" id="file-load-button">Upload</span>
-					</div>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-1" placeholder="Answer" required >
 				</div>
-				<div class="is-hidden">
-					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required>
+			</div>	
+			<!-- security question 2 -->
+			<div class="form-group">
+				<div class="col-sm-4">
+					<select class="form-control" name="security-question-2">
+					{% for key,value in questions.iteritems() %}
+						<option value="{{ key }}">{{ value }}</option>
+					{% endfor %}
+					</select>
 				</div>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-2" placeholder="Answer" required >
+				</div>
+			</div>
+			<!-- signature image upload -->
+			<!-- the file upload. the input is hidden behind my button -->
+			<div class="is-transparent">
+				<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required >
+			</div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Upload Signature</label>
+				<div class="col-sm-6">
+					<button type="button" class="btn btn-default" id="file-load-button" disabled=true>Upload</button>
+				</div>
+			</div>
+			<!-- preview uploaded signature -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Preview Signature</label>
+				<div class="col-sm-6">
+					<div id="status"><img id="preview" class="img-thumbnail img-responsive" src="/static/images/ex-sig.png"></div>
+				</div>
+			</div>
 
-				<div class="form-group">
-					<label class="col-sm-4 control-label">Preview Signature</label>
-					<div class="col-sm-6">
-						<div id="status"><img id="preview" class="img-thumbnail img-responsive" src="/static/images/ex-sig.png"></div>
-					</div>
+			<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" >
+			<
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<button type="submit" class="btn btn-primary">Create Account</button>
 				</div>
-
-				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" >
-
-				<div class="form-group">
-					<div class="col-sm-6 col-sm-offset-4">
-						<button type="submit" class="btn btn-primary">Create Account</button>
-					</div>
-				</div>
+			</div>
 		</form>
 	</div>
 {% block javascript %}

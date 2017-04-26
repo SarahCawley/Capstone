@@ -1,3 +1,4 @@
+<!-- base template to add the logged in information to page -->
 {% extends "base.html" %}
 	<body>
 		{% block navbar %}
@@ -24,7 +25,7 @@
 							<a href="#" class="dropdown-toggle uppercase" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}} <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li class="dropdown-header">Logged in as: {{email}}</li>
-								<li><a href="/update-account">Update Account</a></li>
+								<li><a href="/{{updateRoute | default('update-account')}}">Update Account</a></li>
 								<li role="separator" class="divider"></li>
 								<li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
 							</ul>

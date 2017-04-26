@@ -1,41 +1,99 @@
+<!-- admin home page -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<li class="active"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<!-- navbar -->
+	<li class="active" data-toggle="tab"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li class="dropdown">
+		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-user"></span> User Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/users">View Users</a></li>
+			<li><a href="/new-manager-account">Add Users</a></li>
+		</ul>
+	</li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/admins">View Admins</a></li>
+			<li><a href="/new-admin-account">Add Admins</a></li>
+		</ul>
+	</li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/new-employee">Add Employees</a></li>
+			<li><a href="/employees-list">View Employees</a></li>
+			<li><a href="/award-types">Add Award Types</a></li>
+			<li><a href="/reports">Award Reports</a></li>
+		</ul>
+	</li>
 {% endblock activeNav %}
 
 {% block content %}
 	<div class="container">
-		<div class="row row-buffer">
-			<div class="col-md-6">
-				<a href="/users" class="btn btn-primary btn-lg btn-block btn-huge">View Users<br><br><span class="glyphicon glyphicon-user admin-button"></span></a>
+		<h1>Admin Home</h1>
+		<hr>
+		<div class="row">
+		<!-- users section -->
+			<div class="col-sm-6 col-md-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Users</h3>
+					</div>
+					<div class="panel-body">
+						<a href="/users" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-user"></span> View Users</a>
+						<a href="/new-manager-account" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus"></span> Add New User</a>
+						
+					</div>
+				</div>
 			</div>
-			<div class="col-md-6">
-				<a href="/new-manager-account" class="btn btn-primary btn-lg btn-block btn-huge">Add New User<br><br><span class="glyphicon glyphicon-plus-sign admin-button"></span></a>
+			<!-- admins section-->
+			<div class="col-sm-6 col-md-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Admins</h3>
+					</div>
+					<div class="panel-body">
+						<a href="/admins" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-user"></span> View Other Admins</a>
+						<a href="/new-admin-account" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a>
+					
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="row row-buffer">
-			<div class="col-md-6">
-				<a href="/admins" class="btn btn-primary btn-lg btn-block btn-huge">View Other Admins<br><br><span class="glyphicon glyphicon-globe admin-button"></span></a>
+			<!-- Awards section-->
+			<div class="col-sm-6 col-md-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Awards</h3>
+					</div>
+					<div class="panel-body">
+						<a href="/award-types" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-star-empty"></span> Add Award Types</a>
+						<a href="/employees-list" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-briefcase"></span> View Employees</a>
+						<a href="/new-employee" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus"></span> Add New Employee</a>
+					</div>
+				</div>
 			</div>
-			<div class="col-md-6">
-				<a href="/new-admin-account" class="btn btn-primary btn-lg btn-block btn-huge">Add New Admin<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
-			</div>
-		</div>
-		<div class="row row-buffer">
-			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add Award Types<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
-			</div>
-			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add New Employee<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
-			</div>
-		</div>
-		<div class="row row-buffer">
-			<div class="col-md-12">
-				<a href="/reports" class="btn btn-primary btn-lg btn-block btn-huge">Reporting Dashboard<br><br><span class="glyphicon glyphicon-dashboard admin-button"></span></a>
+			<!-- reporting section -->
+			<div class="col-sm-6 col-md-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Reporting</h3>
+					</div>
+					<div class="panel-body">
+						<a href="/reports"class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-stats"></span> Reporting Dashboard</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
+	
+	
 {% endblock content %}

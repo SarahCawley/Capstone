@@ -1,33 +1,21 @@
+<!-- login page (for both admin and user) -->
 {% extends "base.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block content %}
-<!--
-	<nav class="navbar navbar-inverse navbar-static-top">
-	  <div class="container">
-	    <!-- Brand and toggle get grouped for better mobile display -->
-<!--
-	    <div class="navbar-header">
-	      <a class="navbar-brand" href="/">OSU Capstone</a>
-	    </div>
-	  </div><!-- /.container -->
-<!--
-	</nav>
--->
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-6 line-right">
-
+				<!-- login form -->
 				<h1>Login</h1>
 				<form method="post" action="/login">
-
+					<!-- email -->
 					<div class="form-group">
 						<label for="userNamer">Please enter email address</label>
 						<input class="form-control" id="userName" type="email" name="userName" placeholder="person@email.com">
 					</div>
-
-						
+					<!-- user or admin choice -->	
 					<p>Please choose the account type you are logging in with</p>
 					<div class="form-group">
 						<label class="radio-inline">
@@ -37,7 +25,7 @@
 							<input class="radio" type="radio" name="account-type" value="user" checked>User
 						</label>
 					</div>
-
+					<!-- pasword -->
 					<div class="form-group">
 						<label for="password">Password</label>
 						<input ic="password" class="form-control" type="password" name="password" placeholder="Password">
@@ -49,11 +37,11 @@
 					<button class="btn btn-primary" type="submit">Login</button>
 				</form>
 			</div>
+			<!-- create new account link -->
 			<div class="col-sm-6">
 				<h1>New User?</h1>
 				<a class="btn btn-default btn-lg" href="/new-account">Create New Account</a>
 			</div>
 		</div>
-	</div>
-	
+	</div>	
 {% endblock content %}

@@ -1,5 +1,14 @@
+'''
+Each class in this file serves as an object relational map for the tables 
+in the underlying database. This is done through the use of Flask-SQLAlchemy.
+In general, each class function serves only to initialize the object (analogous
+to an entry into or already existing in the database) and to represent the object
+as a string. The exceptions to this rule can be found in the Account class which
+contains a number of getter and setter methods.
+'''
+
 from handlers.Database import database
-			
+	
 class Account (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	pword = database.db.Column(database.db.String(255), nullable=False)
@@ -11,8 +20,8 @@ class Account (database.db.Model):
 	authenticated = database.db.Column(database.db.Boolean, default=False)
 	code = database.db.Column(database.db.Integer,default=None,nullable=True)
 	
-	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
-	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
+	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined',cascade='all, delete-orphan')
+	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined',cascade='all, delete-orphan')
 	q1 = database.db.relationship('Question',foreign_keys=[q1_id])
 	q2 = database.db.relationship('Question',foreign_keys=[q2_id])
 	
@@ -75,7 +84,7 @@ class Manager (database.db.Model):
 	signature = database.db.Column(database.db.Text, nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
 	
-	created = database.db.relationship('Award', backref='manager',lazy='dynamic')
+	createdBy = database.db.relationship('Award', backref='manager',lazy='dynamic')
 	
 	def __init__(self,account,title,fname,lname,signature,email):
 		self.account = account
@@ -94,7 +103,6 @@ class AwardType (database.db.Model):
 	name = database.db.Column(database.db.String(32),nullable=False)
 
 	type = database.db.relationship('Award', backref='award_type', lazy='dynamic')
-	archive = database.db.relationship('AwardArchive', backref='award_type',lazy='dynamic')
 
 	def __init__(self,name):
 		self.name = name
@@ -104,21 +112,21 @@ class AwardType (database.db.Model):
 
 class Award (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
-	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
+	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='SET NULL',onupdate='RESTRICT'),nullable=True)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	message = database.db.Column(database.db.String(255),nullable=False)
 	issuedOn = database.db.Column(database.db.Date,nullable=False)
-	recepient = database.db.Column(database.db.Integer,database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
+	recipient = database.db.Column(database.db.Integer,database.db.ForeignKey('employee.id',ondelete='SET NULL',onupdate='RESTRICT'),nullable=True)
 	background_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_background.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	theme_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_theme.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	border_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_border.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	
-	def __init__(self,creator,typeId,message,issuedOn,recepient,background,theme,border):
+	def __init__(self,creator,typeId,message,issuedOn,recipient,background,theme,border):
 		self.creator = creator
 		self.type_id = typeId
 		self.message = message
 		self.issuedOn = issuedOn
-		self.recepient = recepient
+		self.recipient = recipient
 		self.background_id = background
 		self.theme_id = theme
 		self.border_id = border
@@ -126,21 +134,9 @@ class Award (database.db.Model):
 	def __repr__(self):
 		return '<Award {0} {1} {2}>'.format(self.creator,self.type_id,self.message)
 
-class AwardArchive (database.db.Model):
-	id = database.db.Column(database.db.Integer, primary_key=True)
-	fname = database.db.Column(database.db.String(32),nullable=False)
-	lname = database.db.Column(database.db.String(32),nullable=False)
-	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
-	recvd = database.db.Column(database.db.DateTime,nullable=False)
-
-	def __init__(self,fname,lname,typeId,recvd):
-		self.fname = fname
-		self.lname = lname
-		self.type_id = typeId
-		self.recvd = recvd
-
-	def __repr__(self):
-		return '<AwardArchive {0} {1} {2}>'.format(self.fname,self.lname,self.type_id)
+	def check_row(self):
+		if self.creator is None and self.recipient is None:
+			return True
 		
 class AwardBackground(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)

@@ -1,3 +1,4 @@
+<!-- in user view: shows all awards a user has created -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
@@ -11,6 +12,7 @@
 {% block content %}
 	<div class="container">
 		<div>
+			<!-- creates table -->
 			{% if awards|length > 0 %}
 			<table class="table">
 				<tr>
@@ -19,6 +21,7 @@
 					<th>Date Granted</th>
 					<th>Delete Award?</th>
 				</tr>
+				<!-- fills table from data base -->
 				{% for award in awards %}
 				<tr>
 					<td>{{awards[award].recipient}}</td>
@@ -28,6 +31,7 @@
 				</tr>
 				{% endfor %}
 			</table>
+			<!-- message if user has not created any awards yet -->
 			{% else %}
 			<p> You have not created any awards yet. Click 'Create Award' above to begin </p>
 			{% endif %}
